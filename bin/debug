@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "pick"
+require "json"
+require "pp"
+
+argv           = ARGV.clone
+aliases        = Hash[argv.shift.split(",").map { |a| a.split(":", 2) }]
+tokens         = Pick.lex(argv)
+tree           = Pick.parse(tokens, aliases: aliases)
+interpretation = Pick.interpret(tree)
+
+puts "-- aliases"
+p aliases
+puts
+
+puts "-- argv"
+p argv
+puts
+
+puts "-- lex -> tokens"
+p tokens
+puts
+
+puts "-- parse -> tree"
+pp tree
+puts
+
+puts "-- interpret -> interpretation"
+p interpretation
+puts
