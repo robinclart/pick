@@ -10,7 +10,7 @@ module Pick
     def method_missing(m, *args, &block)
       if m.to_s.end_with?("?") && @opts.key?(m.to_s.chomp("?"))
         !!@opts[m.to_s.chomp("?")]
-      elsif @opts.key(m.to_s)
+      elsif @opts.key?(m.to_s)
         @opts[m.to_s]
       else
         super

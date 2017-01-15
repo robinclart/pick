@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
+require "irb"
 require "pick"
 require "json"
 require "pp"
@@ -10,23 +11,24 @@ aliases        = Hash[argv.shift.split(",").map { |a| a.split(":", 2) }]
 tokens         = Pick.lex(argv)
 tree           = Pick.parse(tokens, aliases: aliases)
 interpretation = Pick.interpret(tree)
+$command       = Pick::Command.new(**interpretation)
 
+puts
 puts "-- aliases"
 p aliases
 puts
-
 puts "-- argv"
 p argv
 puts
-
-puts "-- lex -> tokens"
+puts "-- tokens"
 p tokens
 puts
-
-puts "-- parse -> tree"
+puts "-- tree"
 pp tree
 puts
-
-puts "-- interpret -> interpretation"
+puts "-- interpretation"
 p interpretation
 puts
+
+ARGV.clear
+IRB.start
