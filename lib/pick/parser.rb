@@ -23,6 +23,9 @@ module Pick
 
         if type?(t, :end_command)
           break
+        elsif type?(t, :start_list)
+          children << parse_list
+          next
         elsif type?(t, :option)
           children << parse_option(t)
           next
@@ -46,6 +49,47 @@ module Pick
       [:command, children]
     end
 
+    def parse_list
+      children = []
+
+      loop do
+        t = consume
+
+        if type?(t, :end_list)
+          break
+        elsif type?(t, :start_list)
+          children << parse_list
+          next
+        elsif type?(t, :bytes)
+          children << bytes(t.last)
+          next
+        elsif type?(t, :duration)
+          children << duration(t.last)
+          next
+        elsif simple_value?(t)
+          children << t.clone
+          next
+        else
+          raise UnexpectedToken, "Unexpected token: #{t.inspect}"
+        end
+      end
+
+      [:list, children]
+    end
+
+    def parse_list_delimiter
+      t = peek
+
+      if type?(t, :list_delimiter)
+        consume
+        return
+      elsif type?(t, :end_list)
+        return
+      else
+        raise UnexpectedToken, "Unexpected token: #{t.inspect}"
+      end
+    end
+
     def parse_option(o)
       t     = peek
       name  = @aliases[o.last] || o.last
@@ -66,9 +110,9 @@ module Pick
       [:option, [[:string, name], value]]
     end
 
-    def parse_env(o)
+    def parse_env(e)
       t     = peek
-      name  = o.last
+      name  = e.last
       value = nil
 
       if type?(t, :assign)
@@ -86,6 +130,8 @@ module Pick
 
       if simple_value?(t)
         t.clone
+      elsif type?(t, :start_list)
+        parse_list
       elsif type?(t, :bytes)
         bytes(t.last)
       elsif type?(t, :duration)

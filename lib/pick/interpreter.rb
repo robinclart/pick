@@ -38,6 +38,8 @@ module Pick
       case type
       when :command
         command({ args: [], opts: {} }, value)
+      when :list
+        list([], value)
       when :option
         option(value)
       when :env
@@ -106,6 +108,14 @@ module Pick
       parent
     end
 
+    def list(parent, nodes)
+      nodes.each do |node|
+        parent << interpret_node(node)
+      end
+
+      parent
+    end
+
     def option(node)
       key   = interpret_node(node.first)
       value = interpret_node(node.last)
@@ -114,8 +124,8 @@ module Pick
     end
 
     def env(node)
-      key   = interpret_node(nil, node.first)
-      value = interpret_node(nil, node.last)
+      key   = interpret_node(node.first)
+      value = interpret_node(node.last)
 
       ENV[key] = value.to_s
       :env
@@ -147,7 +157,7 @@ module Pick
       string(value)
     end
 
-    def time
+    def time(value)
       Time.parse(value)
     rescue
       string(value)

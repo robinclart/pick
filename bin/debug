@@ -6,32 +6,58 @@ require "pick"
 require "json"
 require "pp"
 
-argv           = ARGV.clone
-irb            = argv.shift.strip == "1"
-aliases        = Hash[argv.shift.split(",").map { |a| a.split(":", 2) }]
-tokens         = Pick.lex(argv)
-tree           = Pick.parse(tokens, aliases: aliases)
-interpretation = Pick.interpret(tree)
-$command       = Pick::Command.new(**interpretation)
+argv     = ARGV.clone
+irb      = argv.shift.strip == "1"
+aliases  = Hash[argv.shift.split(",").map { |a| a.split(":", 2) }]
 
 puts
+
 puts "-- aliases"
 p aliases
 puts
+
 puts "-- argv"
 p argv
 puts
+
 puts "-- tokens"
-p tokens
-puts
+begin
+  tokens = Pick.lex(argv)
+  p tokens
+  puts
+rescue => e
+  puts e.message
+  puts e.backtrace
+  puts
+  exit 1
+end
+
 puts "-- tree"
-pp tree
-puts
+begin
+  tree = Pick.parse(tokens, aliases: aliases)
+  pp tree
+  puts
+rescue => e
+  puts e.message
+  puts e.backtrace
+  puts
+  exit 1
+end
+
 puts "-- interpretation"
-p interpretation
-puts
+begin
+  interpretation = Pick.interpret(tree)
+  p interpretation
+  puts
+rescue => e
+  puts e.message
+  puts e.backtrace
+  puts
+  exit 1
+end
 
 if irb
+  $command = Pick::Command.new(**interpretation)
   ARGV.clear
   IRB.start
 end

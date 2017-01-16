@@ -7,8 +7,13 @@ Pick is an opionated CLI options parser.
 ```ruby
 require "pick"
 
-command = Pick.resolve(ARGV, aliases: {
-  "-d" => "--debug"
+command = Pick.resolve(ARGV, {
+  defaults: {
+    "--debug" => false,
+  },
+  aliases: {
+    "-d" => "--debug",
+  }
 })
 
 command.args => []
@@ -29,6 +34,7 @@ command.opts => {}
 - string
 - integer (example: 1)
 - float (example: 1.0)
+- list (ex: [1 500ms 4MB 2017-01-15 robinclart/pick ssh://github.com/robinclart/pick.git yes now])
 - milliseconds (example: 1ms)
 - seconds (example: 1s)
 - minutes (example: 1m)
