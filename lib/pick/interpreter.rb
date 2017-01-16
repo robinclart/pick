@@ -5,110 +5,187 @@ require "uri"
 
 module Pick
   class Interpreter
-    UnknownNode = Class.new(StandardError)
+    UnknownNode  = Class.new(StandardError)
+    InvalidValue = Class.new(StandardError)
+
+    MILLISECONDS = (1 / 1_000.0)
+    SECONDS      = (1)
+    MINUTES      = (60 * SECONDS)
+    HOURS        = (60 * MINUTES)
+    DAYS         = (24 * HOURS)
+
+    BYTES        = (1)
+    KILOBYTES    = (1000 ** 1)
+    MEGABYTES    = (1000 ** 2)
+    GIGABYTES    = (1000 ** 3)
+    TERABYTES    = (1000 ** 4)
+    PETABYTES    = (1000 ** 5)
 
     def initialize(tree)
       @tree = tree
     end
 
     def interpret
-      interpret_node(nil, @tree)
+      interpret_node(@tree)
     end
 
     private
 
-    def insert_nodes_in_command(command, nodes)
-      nodes.each do |node|
-        result = interpret_node(command, node)
-        next if !result
+    def interpret_node(node)
+      type  = node.first
+      value = node.last
 
-        case result
-        when Hash
-          command[:opts].merge!(result)
+      case type
+      when :command
+        command({ args: [], opts: {} }, value)
+      when :option
+        option(value)
+      when :env
+        env(value)
+      when :integer
+        integer(value)
+      when :float
+        float(value)
+      when :string
+        string(value)
+      when :milliseconds
+        duration(value, MILLISECONDS)
+      when :seconds
+        duration(value, SECONDS)
+      when :minutes
+        duration(value, MINUTES)
+      when :hours
+        duration(value, HOURS)
+      when :days
+        duration(value, DAYS)
+      when :bytes
+        bytes(value, BYTES)
+      when :kilobytes
+        bytes(value, KILOBYTES)
+      when :megabytes
+        bytes(value, MEGABYTES)
+      when :gigabytes
+        bytes(value, GIGABYTES)
+      when :terabytes
+        bytes(value, TERABYTES)
+      when :petabytes
+        bytes(value, PETABYTES)
+      when :date
+        date(value)
+      when :time
+        time(value)
+      when :path
+        path(value)
+      when :uri
+        uri(value)
+      when :boolean
+        boolean(value)
+      when :keyword
+        keyword(value)
+      else
+        raise UnknownNode, "Unknown node: #{node.inspect}"
+      end
+    end
+
+    def command(parent, nodes)
+      nodes.each do |node|
+        value = interpret_node(node)
+
+        case value
         when :env
           next
+        when NilClass
+          next
+        when Hash
+          parent[:opts].merge!(value)
         else
-          command[:args] << result
+          parent[:args] << value
         end
       end
 
-      command
+      parent
     end
 
-    def interpret_node(parent, node)
-      case node.first
-      when :command
-        insert_nodes_in_command({ args: [], opts: {} }, node.last)
-      when :option
-        key   = interpret_node(nil, node.last.first)
-        value = interpret_node(nil, node.last.last)
+    def option(node)
+      key   = interpret_node(node.first)
+      value = interpret_node(node.last)
 
-        { key.sub(/^-+/, "") => value }
-      when :env
-        key   = interpret_node(nil, node.last.first)
-        value = interpret_node(nil, node.last.last)
+      { key.sub(/^-+/, "") => value }
+    end
 
-        ENV[key] = value.to_s
-        :env
-      when :integer
-        Integer(node.last)
-      when :float
-        Float(node.last)
-      when :string
-        String(node.last)
-      when :milliseconds
-        Float(node.last) / 1000
-      when :seconds
-        Integer(node.last)
-      when :minutes
-        Integer(node.last) * 60
-      when :hours
-        Integer(node.last) * 60 * 60
-      when :days
-        Integer(node.last) * 60 * 60 * 24
-      when :bytes
-        Integer(node.last)
-      when :kilobytes
-        Integer(node.last) * 1000
-      when :megabytes
-        Integer(node.last) * (1000 ** 2)
-      when :gigabytes
-        Integer(node.last) * (1000 ** 3)
-      when :terabytes
-        Integer(node.last) * (1000 ** 4)
-      when :petabytes
-        Integer(node.last) * (1000 ** 5)
-      when :date
-        Date.parse(node.last)
-      when :time
-        Time.parse(node.last)
-      when :path
-        begin
-          Pathname.new(node.last)
-        rescue
-          String(node.last)
-        end
-      when :uri
-        begin
-          URI.parse(node.last)
-        rescue
-          String(node.last)
-        end
-      when :boolean
-        node.last == "yes"
-      when :keyword
-        case node.last
-        when "now"
-          Time.now.utc
-        when "yesterday"
-          Date.today - 1
-        when "today"
-          Date.today
-        when "tomorrow"
-          Date.today + 1
-        end
+    def env(node)
+      key   = interpret_node(nil, node.first)
+      value = interpret_node(nil, node.last)
+
+      ENV[key] = value.to_s
+      :env
+    end
+
+    def integer(value)
+      Integer(value)
+    end
+
+    def float(value)
+      Float(value)
+    end
+
+    def string(value)
+      String(value)
+    end
+
+    def duration(value, multiplier)
+      integer(value) * multiplier
+    end
+
+    def bytes(value, multiplier)
+      integer(value) * multiplier
+    end
+
+    def date(value)
+      Date.parse(value)
+    rescue
+      string(value)
+    end
+
+    def time
+      Time.parse(value)
+    rescue
+      string(value)
+    end
+
+    def path(value)
+      Pathname.new(value)
+    rescue
+      string(value)
+    end
+
+    def uri(value)
+      URI.parse(value)
+    rescue
+      string(value)
+    end
+
+    def boolean(value)
+      case value
+      when "yes" then true
+      when "no"  then false
       else
-        raise UnknownNode, "Unknown node: #{node.inspect}"
+        raise InvalidValue, "Invalid boolean: #{value}"
+      end
+    end
+
+    def keyword(value)
+      case value
+      when "now"
+        Time.now.utc
+      when "yesterday"
+        Date.today - 1
+      when "today"
+        Date.today
+      when "tomorrow"
+        Date.today + 1
+      else
+        raise InvalidValue, "Invalid keyword: #{value}"
       end
     end
   end

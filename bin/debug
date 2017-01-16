@@ -7,6 +7,7 @@ require "json"
 require "pp"
 
 argv           = ARGV.clone
+irb            = argv.shift.strip == "1"
 aliases        = Hash[argv.shift.split(",").map { |a| a.split(":", 2) }]
 tokens         = Pick.lex(argv)
 tree           = Pick.parse(tokens, aliases: aliases)
@@ -30,5 +31,7 @@ puts "-- interpretation"
 p interpretation
 puts
 
-ARGV.clear
-IRB.start
+if irb
+  ARGV.clear
+  IRB.start
+end

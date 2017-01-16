@@ -1,41 +1,48 @@
 # Pick
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pick`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'pick'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install pick
+Pick is an opionated CLI options parser.
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require "pick"
 
-## Development
+command = Pick.resolve(ARGV, aliases: {
+  "-d" => "--debug"
+})
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+command.args => []
+command.opts => {}
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+## Options, Flags and ENV
 
-## Contributing
+- Option (example: `--force`)
+- Option with argument (example: `--force=no`)
+- Reversible option (example: `--no-force`)
+- Flag (example: `-f`)
+- Flag with argument (example: `-fno`)
+- ENV (example: `FORCE=1`)
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pick.
+## Types
 
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
+- string
+- integer (example: 1)
+- float (example: 1.0)
+- milliseconds (example: 1ms)
+- seconds (example: 1s)
+- minutes (example: 1m)
+- hours (example: 1h)
+- days (example: 1d)
+- bytes (example: 1B)
+- kilobytes (example: 1kB)
+- megabytes (example: 1MB)
+- gigabytes (example: 1GB)
+- terabytes (example: 1TB)
+- petabytes (example: 1PB)
+- date (example: 2017-01-15)
+- time (example: 2017-01-15T12:00:00Z)
+- path (example: robinclart/pick)
+- uri (example: ssh://github.com/robinclart/pick.git)
+- boolean (yes, no)
+- keyword (now, today, yesterday, tomorrow)
