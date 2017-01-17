@@ -92,7 +92,7 @@ module Pick
 
       # uri
 
-      if arg.match(%r/^[a-z]+\:\/\/(.+)/)
+      if arg.match(%r/^[a-z]+\:\/\/(.+)$/)
         @tokens << [:uri, arg]
         return
       end
