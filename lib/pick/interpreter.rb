@@ -9,17 +9,17 @@ module Pick
     InvalidValue = Class.new(StandardError)
 
     MILLISECONDS = (1 / 1_000.0)
-    SECONDS      = (1)
+    SECONDS      = 1
     MINUTES      = (60 * SECONDS)
     HOURS        = (60 * MINUTES)
     DAYS         = (24 * HOURS)
 
-    BYTES        = (1)
-    KILOBYTES    = (1000 ** 1)
-    MEGABYTES    = (1000 ** 2)
-    GIGABYTES    = (1000 ** 3)
-    TERABYTES    = (1000 ** 4)
-    PETABYTES    = (1000 ** 5)
+    BYTES        = 1
+    KILOBYTES    = (1000**1)
+    MEGABYTES    = (1000**2)
+    GIGABYTES    = (1000**3)
+    TERABYTES    = (1000**4)
+    PETABYTES    = (1000**5)
 
     def initialize(tree)
       @tree = tree

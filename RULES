@@ -1,0 +1,64 @@
+MATCH ^--[a-zA-Z0-9-]+$
+TOKEN option *
+
+MATCH ^(--[a-zA-Z0-9-]+)=(.+)?$
+TOKEN option 1
+TOKEN assign '=
+LEX 2
+
+MATCH ^-[a-zA-Z]$
+TOKEN option *
+
+MATCH ^(-[a-zA-Z])(.+)$
+TOKEN option 1
+TOKEN assign
+LEX 2
+
+MATCH ^\[$
+TOKEN start_list *
+
+MATCH ^\]$
+TOKEN end_list *
+
+MATCH ^\[(.+)$/
+TOKEN start_list '[
+SLEX ' *
+
+MATCH ^(.+)\]$
+TOKEN end_list ']
+SLEX * '
+
+MATCH ^([A-Z_]+)=(.+)?$
+TOKEN env 1
+TOKEN assign =
+LEX 2
+
+MATCH ^[a-z]+\:\/\/(.+)$
+TOKEN uri *
+
+MATCH \/
+TOKEN path *
+
+MATCH ^(yes|no)$
+TOKEN boolean *
+
+MATCH ^-?[0-9_]+(B|kB|MB|GB|TB|PB)$
+TOKEN bytes *
+
+MATCH ^-?[0-9_]+(B|kB|MB|GB|TB|PB)$
+TOKEN bytes *
+
+MATCH ^-?[0-9_]+(ms|s|m|h|d)$
+TOKEN duration *
+
+MATCH ^\d{4}-\d{2}-\d{2}$
+TOKEN date *
+
+MATCH ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}
+TOKEN time *
+
+MATCH ^\@(today|tomorrow|yesterday|now)$
+TOKEN keyword *
+
+MATCH .*
+TOKEN string *

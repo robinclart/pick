@@ -23,14 +23,14 @@ module Pick
 
       # option
 
-      if arg.match(%r/^--[a-zA-Z0-9-]+$/)
+      if m = arg.match(/^--[a-zA-Z0-9-]+$/)
         @tokens << [:option, arg]
         return
       end
 
       # option with value
 
-      if m = arg.match(%r/^(--[a-zA-Z0-9-]+)=(.+)?$/)
+      if m = arg.match(/^(--[a-zA-Z0-9-]+)=(.+)?$/)
         @tokens << [:option, m[1]]
         @tokens << [:assign, "="]
         lexarg(m[2])
@@ -39,14 +39,14 @@ module Pick
 
       # flag
 
-      if arg.match(%r/^-[a-zA-Z]$/)
+      if m = arg.match(/^-[a-zA-Z]$/)
         @tokens << [:option, arg]
         return
       end
 
       # flag with value
 
-      if m = arg.match(%r/^(-[a-zA-Z])(.+)$/)
+      if m = arg.match(/^(-[a-zA-Z])(.+)$/)
         @tokens << [:option, m[1]]
         @tokens << [:assign, ""]
         lexarg(m[2])
@@ -65,7 +65,7 @@ module Pick
         return
       end
 
-      if m = arg.match(%r/^\[(.+)$/)
+      if m = arg.match(/^\[(.+)$/)
         lexarg("[")
         m[1].split(" ").compact.map do |a|
           lexarg(a.strip)
@@ -73,7 +73,7 @@ module Pick
         return
       end
 
-      if m = arg.match(%r/^(.+)\]$/)
+      if m = arg.match(/^(.+)\]$/)
         m[1].split(" ").compact.map do |a|
           lexarg(a.strip)
         end
@@ -83,7 +83,7 @@ module Pick
 
       # env
 
-      if m = arg.match(%r/^([A-Z_]+)=(.+)?$/)
+      if m = arg.match(/^([A-Z_]+)=(.+)?$/)
         @tokens << [:env, m[1]]
         @tokens << [:assign, "="]
         lexarg(m[2])
@@ -92,77 +92,77 @@ module Pick
 
       # uri
 
-      if arg.match(%r/^[a-z]+\:\/\/(.+)$/)
+      if m = arg.match(/^[a-z]+\:\/\/(.+)$/)
         @tokens << [:uri, arg]
         return
       end
 
       # path
 
-      if arg.match(%r/\//)
+      if m = arg.match(/\//)
         @tokens << [:path, arg]
         return
       end
 
       # boolean
 
-      if arg.match(%r/^(yes|no)$/)
+      if m = arg.match(/^(yes|no)$/)
         @tokens << [:boolean, arg]
         return
       end
 
       # integer
 
-      if arg.match(%r/^-?\d+$/)
+      if m = arg.match(/^-?\d+$/)
         @tokens << [:integer, arg]
         return
       end
 
       # float
 
-      if arg.match(%r/^-?\d+\.\d+$/)
+      if m = arg.match(/^-?\d+\.\d+$/)
         @tokens << [:float, arg]
         return
       end
 
       # bytes
 
-      if arg.match(%r/^-?[0-9_]+(B|kB|MB|GB|TB|PB)$/)
+      if m = arg.match(/^-?[0-9_]+(B|kB|MB|GB|TB|PB)$/)
         @tokens << [:bytes, arg]
         return
       end
 
       # duration
 
-      if arg.match(%r/^-?[0-9_]+(ms|s|m|h|d)$/)
+      if m = arg.match(/^-?[0-9_]+(ms|s|m|h|d)$/)
         @tokens << [:duration, arg]
         return
       end
 
       # date
 
-      if arg.match(%r/^\d{4}-\d{2}-\d{2}$/)
+      if m = arg.match(/^\d{4}-\d{2}-\d{2}$/)
         @tokens << [:date, arg]
         return
       end
 
       # time
 
-      if arg.match(%r/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/)
+      if m = arg.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/)
         @tokens << [:time, arg]
         return
       end
 
       # keyword
 
-      if arg.match(%r/^\@(today|tomorrow|yesterday|now)$/)
+      if m = arg.match(/^\@(today|tomorrow|yesterday|now)$/)
         @tokens << [:keyword, arg]
         return
       end
 
       @tokens << [:string, arg]
 
-      return
+      nil
     end
   end
 end

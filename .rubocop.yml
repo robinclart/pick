@@ -1,0 +1,27 @@
+AllCops:
+  DisplayCopNames: true
+  Exclude:
+    - 'Gemfile'
+    - 'Gemfile.lock'
+    - 'pick.gemspec'
+
+Lint:
+  Enabled: false
+
+Metrics:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/Documentation:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/RegexpLiteral:
+  AllowInnerSlashes: true

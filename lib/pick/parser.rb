@@ -98,13 +98,11 @@ module Pick
       if type?(t, :assign)
         consume
         value = parse_value
+      elsif o.last.start_with?("--no-")
+        name = name.gsub(/^--no-/, "--")
+        value = [:boolean, "no"]
       else
-        if o.last.start_with?("--no-")
-          name = name.gsub(/^--no-/, "--")
-          value = [:boolean, "no"]
-        else
-          value = [:boolean, "yes"]
-        end
+        value = [:boolean, "yes"]
       end
 
       [:option, [[:string, name], value]]
@@ -143,22 +141,22 @@ module Pick
 
     def bytes(value)
       case value
-      when %r/[0-9_]+B/  then [:bytes,     value.chomp("B")]
-      when %r/[0-9_]+kB/ then [:kilobytes, value.chomp("kB")]
-      when %r/[0-9_]+MB/ then [:megabytes, value.chomp("MB")]
-      when %r/[0-9_]+GB/ then [:gigabytes, value.chomp("GB")]
-      when %r/[0-9_]+TB/ then [:terabytes, value.chomp("TB")]
-      when %r/[0-9_]+PB/ then [:petabytes, value.chomp("PB")]
+      when /[0-9_]+B/  then [:bytes,     value.chomp("B")]
+      when /[0-9_]+kB/ then [:kilobytes, value.chomp("kB")]
+      when /[0-9_]+MB/ then [:megabytes, value.chomp("MB")]
+      when /[0-9_]+GB/ then [:gigabytes, value.chomp("GB")]
+      when /[0-9_]+TB/ then [:terabytes, value.chomp("TB")]
+      when /[0-9_]+PB/ then [:petabytes, value.chomp("PB")]
       end
     end
 
     def duration(value)
       case value
-      when %r/[0-9_]+ms/ then [:milliseconds, value.chomp("ms")]
-      when %r/[0-9_]+s/  then [:seconds,      value.chomp("s")]
-      when %r/[0-9_]+m/  then [:minutes,      value.chomp("m")]
-      when %r/[0-9_]+h/  then [:hours,        value.chomp("h")]
-      when %r/[0-9_]+d/  then [:days,         value.chomp("d")]
+      when /[0-9_]+ms/ then [:milliseconds, value.chomp("ms")]
+      when /[0-9_]+s/  then [:seconds,      value.chomp("s")]
+      when /[0-9_]+m/  then [:minutes,      value.chomp("m")]
+      when /[0-9_]+h/  then [:hours,        value.chomp("h")]
+      when /[0-9_]+d/  then [:days,         value.chomp("d")]
       end
     end
 
