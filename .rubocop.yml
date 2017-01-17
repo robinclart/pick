@@ -2,7 +2,6 @@ AllCops:
   DisplayCopNames: true
   Exclude:
     - 'Gemfile'
-    - 'Gemfile.lock'
     - 'pick.gemspec'
 
 Lint:
