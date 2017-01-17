@@ -176,13 +176,13 @@ module Pick
 
     def keyword(value)
       case value
-      when "now"
+      when "@now"
         Time.now.utc
-      when "yesterday"
+      when "@yesterday"
         Date.today - 1
-      when "today"
+      when "@today"
         Date.today
-      when "tomorrow"
+      when "@tomorrow"
         Date.today + 1
       else
         raise InvalidValue, "Invalid keyword: #{value}"

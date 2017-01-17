@@ -97,7 +97,7 @@ module Pick
         return
       end
 
-      if arg.match(%r/^(today|tomorrow|yesterday|now)$/)
+      if arg.match(%r/^\@(today|tomorrow|yesterday|now)$/)
         @tokens << [:keyword, arg]
         return
       end
